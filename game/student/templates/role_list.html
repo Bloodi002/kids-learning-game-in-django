@@ -1,0 +1,22 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+  Role List
+{% endblock %}
+{% block content %}
+  <h1 class="text-center mt-4">hello world</h1>
+
+  <a class="btn btn-primary mb-4 " href="{% url 'role_create' %}">Create a new role</a>
+
+  <div class="container row gap-3">
+    {% for role in roles %}
+      <div class="card" style="width: 18rem;">
+        <div class="card-body">
+          <h5 class="card-title">{{role.role_type}}</h5>
+          <a href="{% url 'role_edit' role.role_id%}" class="card-link">Edit</a>
+          <a href="{% url 'role_conform_delete' role.role_id%}" class="card-link">Delete</a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}
