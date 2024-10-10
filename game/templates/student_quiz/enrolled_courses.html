@@ -1,0 +1,31 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+  Enrolled Courses
+{% endblock %}
+
+{% block content %}
+<div class="mt-4">
+    <h2>Your Enrolled Courses</h2>
+    <div class="row">
+        {% for course in courses %}
+            <div class="col-md-4 mb-4"> <!-- Adjust the column size as needed -->
+                <div class="card">
+                    <img src="https://picsum.photos/300/200?rand={{ course.course_id }}" class="card-img-top" alt="{{ course.course_id.name }}"> <!-- Placeholder image -->
+                    <div class="card-body">
+                        <h5 class="card-title">{{ course.course_id.name }}</h5>
+                        <p class="card-text">This is a brief description of the course.</p> <!-- You can customize this -->
+                        <a href="{% url 'course_problems' course.course_id %}" class="btn btn-primary">View Problems</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-warning" role="alert">
+                    You are not enrolled in any courses.
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

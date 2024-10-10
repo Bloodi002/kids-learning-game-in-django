@@ -134,4 +134,4 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 LOGIN_URL = '/accounts/login'
 
 LOGIN_REDIREC_URL = '/student/'
-LOGOUT_REDIREC_URL = '/student/'
+LOGOUT_REDIREC_URL = '/login/'

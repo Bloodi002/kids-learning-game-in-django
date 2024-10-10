@@ -1,0 +1,57 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+  Problems for Course: {{ course.name }}
+{% endblock %}
+
+{% block content %}
+  <div class="mt-4">
+    <h2 class="mb-4 text-center">Problems for Course: <strong>{{ course.name }}</strong></h2>
+    <div class="row">
+      {% for problem in problems %}
+        <div class="col-md-4 mb-4">
+          <div class="card shadow-sm h-100 d-flex flex-column">
+            <!-- Make card a flex container -->
+            <div class="card-body d-flex flex-column flex-grow-1">
+              <!-- Use flex to control layout -->
+              <h4 class="card-title font-weight-bold">{{ problem.problem_level_id.problem_type.type }}</h4>
+              <h5 class="card-subtitle mb-2 text-muted">Level: {{ problem.problem_level_id.level }}</h5>
+
+              <div class="mb-3">
+                <p class="card-text text-secondary" style="font-size: 0.9em;">
+                  <strong>Max Score:</strong> {{ problem.max_score }}
+                </p>
+                <p class="card-text text-secondary" style="font-size: 0.9em;">
+                  <strong>Min Score:</strong> {{ problem.min_score }}
+                </p>
+                <p class="card-text text-secondary" style="font-size: 0.9em;">
+                  <strong>Time Limit:</strong> {{ problem.time_bound.total_seconds }} minutes
+                </p>
+              </div>
+
+              {% if problem.attempted %}
+                <!-- If problem was attempted, show the score and correct answer -->
+                <p class="text-success">
+                  <strong>Your Score:</strong> {{ problem.score }}
+                </p>
+                <p class="text-danger">
+                  <strong>Correct Answer:</strong> {{ problem.answer }}
+                </p>
+                <span style="cursor: not-allowed"><a href="#" class="btn btn-secondary disabled w-100">Attempted</a></span>
+              {% else %}
+                <div class="mt-auto">
+                  <!-- Push button to the bottom -->
+                  <a href="{% url 'problem_view' problem.problem_id %}" class="btn btn-primary w-100">Challenge Yourself</a>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <div class="col-12">
+          <div class="alert alert-warning" role="alert">No problems available for this course.</div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}
