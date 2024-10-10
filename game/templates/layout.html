@@ -16,22 +16,33 @@
       <div class="container-fluid">
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
         <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
-          <a class="navbar-brand" href="#">Student</a>
+          <a class="navbar-brand" href="/student">Student</a>
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">Home</a>
+              <a class="nav-link active" aria-current="page" href="/student">Courses</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Link</a>
+              <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Calender</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+              <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Time Table</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Achievements</a>
             </li>
           </ul>
-          <form class="d-flex">
-            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
-            <button class="btn btn-outline-success" type="submit">Search</button>
-          </form>
+
+          <div class="d-flex align-items-center">
+            <!-- Update Profile link -->
+            <span style="cursor: not-allowed"  >
+              <a href="#" class="btn btn-secondary me-2 disabled">Update Profile</a>
+            </span>
+            <!-- Logout form using POST method -->
+            <form method="post" action="{% url 'logout' %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger">Logout</button>
+            </form>
+          </div>
         </div>
       </div>
     </nav>
@@ -40,6 +51,6 @@
 
       {% endblock %}
     </div>
-    <script src="/static/scripts/validation.js"></script>
+    {% comment %} <script src="/static/scripts/validation.js"></script> {% endcomment %}
   </body>
 </html>

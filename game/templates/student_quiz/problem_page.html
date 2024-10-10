@@ -1,0 +1,63 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+  Problem: {{ problem.statement }}
+{% endblock %}
+
+{% block content %}
+<div class="mt-4">
+    <h1>{{problem.problem_level_id}}</h1>
+    <h2>{{ problem.statement }}</h2>
+    <p>Max Score: {{ problem.max_score }}</p>
+    <p>Min Score: {{ problem.min_score }}</p>
+    <p>
+        Time remaining: 
+        <span id="timer">{{ problem.time_bound }}</span> minutes and 
+        <span id="seconds">{{ problem.time_bound }}</span> seconds
+    </p>
+    <p id="notification" style="display: none; color: red;">Time's up! You will be redirected in 3 seconds...</p>
+
+    <form method="POST" action="">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="answer">Enter your answer:</label>
+            <input type="text" name="answer" class="form-control" id="answer" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+
+<!-- Countdown Timer Script -->
+<script>
+    var countdown = {{ problem.time_bound.total_seconds }} * 60;  // Use the dynamic time bound value
+    var minutesElement = document.getElementById('timer');
+    var secondsElement = document.getElementById('seconds');
+    var notificationElement = document.getElementById('notification');
+
+    function countdownRedirect() {
+        if (countdown > 0) {
+            countdown--;  // Decrease countdown
+
+            // Update the display for minutes and seconds
+            var minutes = Math.floor(countdown / 60);
+            var seconds = countdown % 60;
+
+            minutesElement.innerHTML = minutes;
+            secondsElement.innerHTML = seconds < 10 ? '0' + seconds : seconds;  // Format seconds to always show two digits
+        } else {
+            // When time runs out, show the notification
+            minutesElement.style.display = 'none';  // Hide the timer
+            secondsElement.style.display = 'none';
+            notificationElement.style.display = 'block';  // Show the notification
+
+            // Start a second countdown for redirect (3 seconds)
+            setTimeout(function() {
+                window.location.href = "{% url 'problem_timeout' problem.problem_id %}";
+            }, 3000);  // Redirect after 3 seconds
+        }
+    }
+
+    // Start the countdown every second
+    setInterval(countdownRedirect, 1000);
+</script>
+{% endblock %}
