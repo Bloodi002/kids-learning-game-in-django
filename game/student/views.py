@@ -3,22 +3,36 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from .models import CourseContactMapping, Course, Problem, Contact, Role, ProblemScoreMapping
-from .forms import RoleForm, UserRegistrationForm
+from .forms import RoleForm, UserRegistrationForm, CourseRegistrationForm
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, authenticate
+from django.core.exceptions import PermissionDenied
+from datetime import datetime
 
 
 def index(request):
     return render(request, 'index.html')
 
+def role_required(role_type):
+    def decorator(func):
+        def wrap(request, *args, **kwargs):
+            contact = Contact.objects.get(user=request.user)
+            if contact.role_id.role_type == role_type:
+                return func(request, *args, **kwargs)
+            else:
+                raise PermissionDenied
+        return wrap
+    return decorator
 
 @login_required
+@role_required('Teacher')
 def role_list(request):
     roles = Role.objects.all().order_by('-role_id')
     return render(request, 'role_list.html', {'roles': roles})
 
 @login_required
+@role_required('Teacher')
 def role_create(request):
     if request.method == "POST":
         form = RoleForm(request.POST, request.FILES)
@@ -32,6 +46,7 @@ def role_create(request):
     return render(request, 'role_form.html', {'form': form})
 
 @login_required
+@role_required('Teacher')
 def role_edit(request, role_id):
     # role = get_object_or_404(Role, pk=role_id, user = request.user)
     role = get_object_or_404(Role, pk=role_id)
@@ -46,6 +61,7 @@ def role_edit(request, role_id):
     return render(request, 'role_form.html', {'form': form})
 
 @login_required
+@role_required('Teacher')
 def role_delete(request, role_id):
     # role = get_object_or_404(Role, pk=role_id, user = request.user)
     role = get_object_or_404(Role, pk=role_id)
@@ -89,6 +105,7 @@ def logout_view(request):
     return redirect('login')
 
 @login_required
+@role_required('Student')
 def enrolled_courses(request):
     # Get the current user's associated contact
     contact = get_object_or_404(Contact, user=request.user)
@@ -100,6 +117,7 @@ def enrolled_courses(request):
 
 
 @login_required 
+@role_required('Student')
 def course_problems(request, course_id):
     course = get_object_or_404(Course, pk=course_id)
     
@@ -122,6 +140,7 @@ def course_problems(request, course_id):
     return render(request, 'student_quiz/course_problems.html', {'course': course, 'problems': problems})
 
 @login_required
+@role_required('Student')
 def problem_view(request, problem_id):
     # Get the problem instance
     problem = get_object_or_404(Problem, pk=problem_id)
@@ -153,6 +172,7 @@ def problem_view(request, problem_id):
     })
     
 @login_required
+@role_required('Student')
 def problem_timeout_view(request, problem_id):
     problem = get_object_or_404(Problem, pk=problem_id)
     
@@ -167,10 +187,108 @@ def problem_timeout_view(request, problem_id):
     # Redirect to the problems list page after timeout
     return HttpResponseRedirect(reverse('course_problems', args=[problem.course_id]))
 
+def teacher_login_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            # Check if the user is a teacher
+            contact = Contact.objects.get(user=user)
+            if contact.role_id.role_type == 'Teacher':
+                login(request, user)
+                return redirect('teacher_dashboard')
+            else:
+                return render(request, 'registration/teacher_login.html', {'error': 'Not authorized as teacher'})
+        else:
+            return render(request, 'registration/teacher_login.html', {'error': 'Invalid credentials'})
+    
+    return render(request, 'registration/teacher_login.html')
 
 
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            # Check if the user is a student
+            contact = Contact.objects.get(user=user)
+            if contact.role_id.role_type == 'Student':
+                login(request, user)
+                return redirect('enrolled_courses')  # Redirect to student dashboard
+            else:
+                return render(request, 'login.html', {'error': 'Not authorized as student'})
+        else:
+            return render(request, 'login.html', {'error': 'Invalid credentials'})
+    
+    return render(request, 'registration/login.html')
 
 
+@login_required
+@role_required('Teacher')  
+
+def teacher_dashboard(request):
+    return render(request, 'teacher/teacher_dashboard.html', {'current_year': datetime.now().year})
+
+
+from django.http import JsonResponse
+
+from django.http import JsonResponse
+
+@login_required
+@role_required('Teacher')  # Ensure only teachers can access this view
+def register_students_in_course(request):
+    if request.method == 'POST':
+        form = CourseRegistrationForm(request.POST)
+        if form.is_valid():
+            course = form.cleaned_data['course']
+            students = form.cleaned_data['students']
+
+            for student in students:
+                contact = get_object_or_404(Contact, id=student.id)
+                CourseContactMapping.objects.create(course_id=course, contact_id=contact)
+
+            return redirect('teacher_dashboard')  # Redirect to dashboard after successful registration
+    else:
+        form = CourseRegistrationForm()
+
+    # Handle AJAX request for student filtering
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':  # Modern way to detect AJAX request
+        course_id = request.GET.get('course_id')
+        if course_id:
+            try:
+                course_id = int(course_id)
+                registered_students = CourseContactMapping.objects.filter(course_id=course_id).values_list('contact_id', flat=True)
+                students = Contact.objects.filter(role_id__role_type='Student').exclude(id__in=registered_students)
+                # Fetch user__username and email_id
+                student_list = list(students.values('id', 'user__username', 'email_id'))
+                return JsonResponse({'students': student_list})
+            except (ValueError, TypeError):
+                pass
+        return JsonResponse({'students': []})
+
+    return render(request, 'teacher/register_students_in_course.html', {'form': form})
+
+
+@login_required
+@role_required('Teacher')  # Only allow access for Teachers
+def student_course_list(request):
+    # Get all students and their registered courses
+    students = Contact.objects.filter(role_id__role_type='Student')
+    
+    # For each student, find their registered courses
+    student_courses = []
+    for student in students:
+        courses = CourseContactMapping.objects.filter(contact_id=student).select_related('course_id')
+        student_courses.append({
+            'student': student,
+            'courses': courses
+        })
+
+    return render(request, 'teacher/student_course_list.html', {'student_courses': student_courses})
 
 
 

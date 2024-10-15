@@ -1,11 +1,23 @@
 {% extends 'blank_layout.html' %}
 
 {% block content %}
-  <h2>Login Form</h2>
-  <form method="post">
+  <h2>Student Login</h2>
+
+  {% if error %}
+    <p style="color: red;">{{ error }}</p>
+  {% endif %}
+
+  <form method="POST">
     {% csrf_token %}
-    {{form.as_p}}
-    <button class="btn btn-primary">Login</button>
+    <label for="username">Username</label>
+    <input type="text" name="username" id="username" />
+    <label for="password">Password</label>
+    <input type="password" name="password" id="password" />
+    <button type="submit">Login</button>
   </form>
-  <p>Don't have an account? <a href="{%url 'register'%}">Register now!</a></p>
+
+  <a href="{% url 'teacher_login' %}">Login as Teacher</a>
+  <p>
+    Don't have an account? <a href="{% url 'register' %}">Register now!</a>
+  </p>
 {% endblock %}

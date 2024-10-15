@@ -1,0 +1,82 @@
+{% extends 'teacher_layout.html' %}
+{% load widget_tweaks %}
+{% block title %}
+  Register Students in Course
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <h1 class="card-title text-center mb-4">Register Students in a Course</h1>
+          
+          <form method="post" class="mt-4">
+            {% csrf_token %}
+            <div class="form-group mb-3">
+              <label class="form-label">{{ form.course.label }}</label>
+              {{ form.course|add_class:'form-control' }} <!-- Apply class using widget_tweaks -->
+            </div>
+
+            <div class="form-group mb-3">
+              <label class="form-label">{{ form.students.label }}</label>
+              <select id="id_students" class="form-control" name="students" multiple>
+                <!-- Student options will be dynamically populated here -->
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100">Register Students</button>
+          </form>
+
+          <div class="mt-3 text-center">
+            <a href="{% url 'teacher_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function() {
+      $('#id_course').change(function() {
+          var courseId = $(this).val();
+          if (courseId) {
+              $.ajax({
+                  url: "{% url 'register_students_in_course' %}",
+                  data: {
+                      'course_id': courseId
+                  },
+                  dataType: 'json',
+                  success: function(data) {
+                      var studentsSelect = $('#id_students');
+                      studentsSelect.empty();  // Clear current options
+                      if (data.students.length > 0) {
+                          $.each(data.students, function(index, student) {
+                              studentsSelect.append(
+                                  $('<option>', {
+                                      value: student.id,
+                                      // Display username and email
+                                      text: student.user__username + ' (' + student.email_id + ')'
+                                  })
+                              );
+                          });
+                      } else {
+                          studentsSelect.append(
+                              $('<option>', {
+                                  value: '',
+                                  text: 'No available students'
+                              })
+                          );
+                      }
+                  }
+              });
+          } else {
+              $('#id_students').empty();  // If no course selected, clear the student list
+          }
+      });
+  });
+</script>
+{% endblock %}
