@@ -2,9 +2,10 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from .models import CourseContactMapping, Course, Problem, Contact, Role, ProblemScoreMapping
+from .models import CourseContactMapping, Course, Problem, Contact, Role, ProblemScoreMapping, Achievement
 from .forms import RoleForm, UserRegistrationForm, CourseRegistrationForm
 from django.shortcuts import get_object_or_404, redirect
+from django.db.models import Avg
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate
 from django.core.exceptions import PermissionDenied
@@ -291,5 +292,31 @@ def student_course_list(request):
     return render(request, 'teacher/student_course_list.html', {'student_courses': student_courses})
 
 
+@login_required
+def achievement_view(request):
+    achievements = Achievement.objects.filter(user=request.user)
+    if achievements.exists():
+        # Calculate the average score
+        total_correct_answers = achievements.aggregate(Avg('correct_answers'))['correct_answers__avg']
+        average_score = round((total_correct_answers / 100) * 10, 2)  # Assuming 100 is the max score
+        
+        # Assign a badge based on the average score
+        if 8 <= average_score <= 10:
+            badge = 'GOLD'
+        elif 5 <= average_score < 8:
+            badge = 'SILVER'
+        elif 2 <= average_score < 5:
+            badge = 'BRONZE'
+        else:
+            badge = 'You need to try hard'
+    else:
+        average_score = 0
+        badge = 'You need to try hard'
+
+    return render(request, 'achievement.html', {
+        'achievements': achievements,
+        'average_score': average_score,
+        'badge': badge
+    })
 
 
