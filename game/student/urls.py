@@ -22,4 +22,6 @@ urlpatterns = [
     path('teacher/dashboard/', views.teacher_dashboard, name='teacher_dashboard'),
     path('teacher/register_students/',views.register_students_in_course, name='register_students_in_course'),
     path('teacher/student-courses/', views.student_course_list, name='student_course_list'),
+    
+    path('achievement/', views.achievement_view, name='achievement'),
 ]
