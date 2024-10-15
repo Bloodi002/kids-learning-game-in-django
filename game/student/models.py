@@ -83,3 +83,11 @@ class CourseContactMapping(models.Model):
     def __str__(self):
         return f'{self.contact_id}'
     
+class Achievement(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    correct_answers = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    update_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user.username}: {self.correct_answers} correct answers"
