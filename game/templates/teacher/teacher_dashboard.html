@@ -1,0 +1,24 @@
+{% extends 'teacher_layout.html' %}
+
+{% block title %}
+  Teacher Dashboard
+{% endblock %}
+
+{% block content %}
+  <h2 class="text-center my-4">Teacher Dashboard</h2>
+
+  <div class="container">
+    <div class="row justify-content-center">
+      <!-- Bootstrap Card for Registering Students -->
+      <div class="col-md-6">
+        <div class="card shadow-sm border-0">
+          <div class="card-body text-center">
+            <h4 class="card-title">Register Students in a Course</h4>
+            <p class="card-text">Manage your courses and register students quickly and easily.</p>
+            <a href="{% url 'register_students_in_course' %}" class="btn btn-primary btn-lg w-100 mt-3">Register Now</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

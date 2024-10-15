@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/static/bootstrap/styles.css" />
     <title>
       {% block title %}
-        Students
+        Teacher
       {% endblock %}
     </title>
   </head>
@@ -16,19 +16,19 @@
       <div class="container-fluid">
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
         <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
-          <a class="navbar-brand" href="/student">Student</a>
+          <a class="navbar-brand" href="/teacher/dashboard">Welcome Proffesor</a>
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/student">Courses</a>
+              <a class="nav-link" href="{% url 'teacher_dashboard' %}">Dashboard</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Calender</a>
+              <a class="nav-link" href="{% url 'register_students_in_course' %}" tabindex="-1" aria-disabled="true">Register students in your course</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Time Table</a>
+              <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Create Questions</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Achievements</a>
+              <a class="nav-link" href="{% url 'student_course_list' %}" tabindex="-1" aria-disabled="true">Student List</a>
             </li>
           </ul>
 
@@ -49,6 +49,5 @@
 
       {% endblock %}
     </div>
-    {% comment %} <script src="/static/scripts/validation.js"></script> {% endcomment %}
   </body>
 </html>
