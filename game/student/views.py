@@ -239,8 +239,6 @@ def teacher_dashboard(request):
 
 from django.http import JsonResponse
 
-from django.http import JsonResponse
-
 @login_required
 @role_required('Teacher')  # Ensure only teachers can access this view
 def register_students_in_course(request):
