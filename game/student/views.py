@@ -10,6 +10,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate
 from django.core.exceptions import PermissionDenied
 from datetime import datetime
+from django.http import HttpResponse
+import subprocess
 
 
 def index(request):
@@ -317,4 +319,18 @@ def achievement_view(request):
         'badge': badge
     })
 
+def run_opencv_script(request):
+    # Run the Python script using subprocess
+    try:
+        # Replace the path below with the actual path to your Python script
+        script_path = 'C:/path_to_your_script/opencv_script.py'
+        process = subprocess.Popen(['python', script_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = process.communicate()
 
+        if process.returncode == 0:
+            return HttpResponse(f"Script executed successfully.<br>{stdout.decode('utf-8')}")
+        else:
+            return HttpResponse(f"Script failed to execute.<br>Error: {stderr.decode('utf-8')}")
+    
+    except Exception as e:
+        return HttpResponse(f"Error running script: {str(e)}")
