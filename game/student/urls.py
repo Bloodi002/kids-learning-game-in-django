@@ -24,4 +24,5 @@ urlpatterns = [
     path('teacher/student-courses/', views.student_course_list, name='student_course_list'),
     
     path('achievement/', views.achievement_view, name='achievement'),
+    path('run-script/', views.run_opencv_script, name='run_script'),
 ]
