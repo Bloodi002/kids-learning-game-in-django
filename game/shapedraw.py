@@ -14,7 +14,7 @@ cap.set(3, wCam)  # Set width
 cap.set(4, hCam)  # Set height
 
 # Load finger images for overlay
-folderpath = "C:/opencv/game/Fingerimages"
+folderpath = "G:/SHLOK/Swinburne University of Tech/Sem 1/Technology Inquiry Project/kids-learning-game-in-django/game/Fingerimages"
 myList = os.listdir(folderpath)
 print(myList)
 overlayList = []
