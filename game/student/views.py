@@ -12,6 +12,7 @@ from django.core.exceptions import PermissionDenied
 from datetime import datetime
 from django.http import HttpResponse
 import subprocess
+import os
 
 
 def index(request):
@@ -323,7 +324,8 @@ def run_opencv_script(request):
     # Run the Python script using subprocess
     try:
         # Replace the path below with the actual path to your Python script
-        script_path = 'C:/path_to_your_script/opencv_script.py'
+        base_dir = os.getcwd()
+        script_path = os.path.join(base_dir, 'shapedraw.py')
         process = subprocess.Popen(['python', script_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = process.communicate()
 
