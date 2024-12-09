@@ -4,7 +4,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="/static/bootstrap/styles.css" />
+    <link rel="stylesheet" href="{% static 'bootstrap/styles.css' %}" />
     <title>
       {% block title %}
         Students
@@ -17,6 +17,6 @@
 
       {% endblock %}
     </div>
-    <script src="/static/scripts/validation.js"></script>
+    <script src="{% static 'scripts/validation.js' %}"></script>
   </body>
 </html>
